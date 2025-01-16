@@ -36,7 +36,8 @@ public class EventService {
         return modelMapper.map(event, EventDTO.class);
     }
 
-    public void deleteEvent(Long id) {
+    public void deleteInstitution(Long id) {
         repository.deleteById(id);
     }
+
 }

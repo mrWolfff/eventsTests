@@ -39,8 +39,8 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<EventDTO> deleteEvent(@PathVariable @NotNull Long id) {
-        service.deleteEvent(id);
+    public ResponseEntity<EventDTO> deleteInstitution(@PathVariable @NotNull Long id) {
+        service.deleteInstitution(id);
         return ResponseEntity.noContent().build();
     }
 }

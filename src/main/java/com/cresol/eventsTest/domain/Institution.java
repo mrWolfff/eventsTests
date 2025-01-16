@@ -16,7 +16,7 @@ public class Institution {
     private String name;
     @NotNull
     private TypeInstitution type;
-    @NotNull
+
     @OneToMany(mappedBy = "institution", fetch = FetchType.LAZY)
     private List<Event> events;
 
