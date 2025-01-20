@@ -1,40 +1,30 @@
 package com.cresol.eventsTest.service;
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.ConnectionFactory;
-import org.springframework.stereotype.Component;
+
+import com.cresol.eventsTest.configuration.RabbitConfig;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Map;
 
-@Component
+@Service
 public class EventPublisher {
-    private static final String EXCHANGE_NAME = "event.exchange";
+    private final RabbitTemplate rabbitTemplate;
 
-    public void publishEvent(String eventId, Date initialDate, Date finalDate) throws Exception {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
-        try(var connection = factory.newConnection();
-            var channel = connection.createChannel()) {
-
-            channel.exchangeDeclare(EXCHANGE_NAME, "x-delayed-message", true, false,
-                    Map.of("x-delayed-type", "direct"));
-            long activationDelay = ChronoUnit.MILLIS.between(LocalDateTime.now(), initialDate.toInstant());
-            publishMessage(channel, "event.activate", eventId, activationDelay, "ativado!");
-
-            long deactivationDelay = ChronoUnit.MILLIS.between(LocalDateTime.now(), finalDate.toInstant());
-            publishMessage(channel, "event.deactivate", eventId, deactivationDelay, "desativado!");
-        }
+    public EventPublisher(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void publishMessage(Channel channel, String routingKey, String eventId, long delay, String action) throws Exception{
-        AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder()
-                .headers(Map.of("x-delay", delay))
-                .build();
-        String message = action + " Evento: " + eventId;
-        channel.basicPublish(EXCHANGE_NAME, routingKey, properties, message.getBytes(StandardCharsets.UTF_8));
+    public void sendDelayedMessage(String messageStr, LocalDateTime date) {
+        long delay = Duration.between(LocalDateTime.now(), date).toMillis();
+
+        MessageProperties props = new MessageProperties();
+        props.setHeader("x-delay", delay);
+        Message message = new Message(messageStr.getBytes(StandardCharsets.UTF_8), props);
+
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, "", message);
     }
 }

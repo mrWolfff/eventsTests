@@ -1,4 +1,4 @@
 package com.cresol.eventsTest.domain;
 
-public record InstitutionDTO(Long id, String name, TypeInstitution type) {
+public record InstitutionDTO(Long id, TypeInstitution type, String name) {
 }
