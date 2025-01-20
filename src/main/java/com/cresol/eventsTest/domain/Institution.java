@@ -20,4 +20,7 @@ public class Institution {
     @OneToMany(mappedBy = "institution", fetch = FetchType.LAZY)
     private List<Event> events;
 
+    public Long getId() {
+        return id;
+    }
 }
