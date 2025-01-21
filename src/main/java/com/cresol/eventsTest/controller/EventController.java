@@ -41,7 +41,7 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<?> createEvent(@RequestBody @Valid EventDTO dto, UriComponentsBuilder uriBuilder) {
-        Institution institution = institutionRepository.findById(dto.institution().getId())
+        Institution institution = institutionRepository.findById(dto.institutionId())
                 .orElseThrow();
         boolean isExistEvent = repository.findExistingEvent(
                 institution.getId(), dto.initialDate(), dto.finalDate()).isPresent();
@@ -49,7 +49,7 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Um evento já existe para esta instituição no intervalo especificado.");
         }
-        EventDTO event = service.createEvent(dto);
+        EventDTO event = service.createEvent(dto, institution);
         URI address = uriBuilder.path("/event/{id}").buildAndExpand(event.id()).toUri();
         return ResponseEntity.created(address).body(event);
     }

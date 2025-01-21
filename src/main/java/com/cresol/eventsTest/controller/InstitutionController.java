@@ -17,7 +17,6 @@ import java.util.List;
 public class InstitutionController {
     @Autowired
     private InstitutionService service;
-
     @GetMapping
     public ResponseEntity<List<InstitutionDTO>> getInstitution() {
         return ResponseEntity.ok(service.getInstitutions());
@@ -30,10 +29,10 @@ public class InstitutionController {
     }
 
     @PostMapping
-    public ResponseEntity<InstitutionDTO> createEvent(@RequestBody @Valid InstitutionDTO dto, UriComponentsBuilder uriBuilder) {
-        InstitutionDTO event = service.createInstitution(dto);
-        URI address = uriBuilder.path("/event/{id}").buildAndExpand(event.id()).toUri();
-        return ResponseEntity.created(address).body(event);
+    public ResponseEntity<InstitutionDTO> createInstitution(@RequestBody @Valid InstitutionDTO dto, UriComponentsBuilder uriBuilder) {
+        InstitutionDTO institution = service.createInstitution(dto);
+        URI address = uriBuilder.path("/event/{id}").buildAndExpand(institution.id()).toUri();
+        return ResponseEntity.created(address).body(institution);
     }
 
     @DeleteMapping("/{id}")

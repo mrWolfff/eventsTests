@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "event")
@@ -17,19 +15,27 @@ public class Event {
     @NotBlank
     private String name;
     @NotNull
-    private Date initialDate;
+    private LocalDateTime initialDate;
     @NotNull
-    private Date finalDate;
+    private LocalDateTime finalDate;
     @NotNull
     private Boolean active;
     @ManyToOne(fetch = FetchType.LAZY)
     private Institution institution;
 
-    public boolean isACtive() {
-        LocalDate today = LocalDate.now();
-        return (today.isEqual(initialDate) || today.isAfter(initialDate)) && today.isBefore(finalDate.plusDays(1));
+    public Event(EventDTO dto) {
+        this.name = dto.name();
+        this.initialDate = dto.initialDate();
+        this.finalDate = dto.finalDate();
+        this.active = dto.active();
+    }
+    public Event(){
     }
 
+    public boolean isActive() {
+        LocalDateTime today = LocalDateTime.now();
+        return (today.isEqual(initialDate) || today.isAfter(initialDate)) && today.isBefore(finalDate.plusDays(1));
+    }
     public Institution getInstitution() {
         return institution;
     }
@@ -50,7 +56,21 @@ public class Event {
         return id;
     }
 
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
     public String getName() {
         return name;
+    }
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", initialDate=" + initialDate +
+                ", finalDate=" + finalDate +
+                ", active=" + active +
+                ", institution=" + institution +
+                '}';
     }
 }
